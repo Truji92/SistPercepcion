@@ -73,6 +73,32 @@ subplot(1,2,2); imshow(IcuadroContrasteAlto);
 %    observas si en lugar de utilizar la máscara “ HP = ones(5,5)/25 ” 
 %    se utiliza “ HP = ones(9,9)/81 ”.
 
+HP = ones(5,5)/25;
+HP2 = ones(9,9)/81;
+HL = [-1 -1 -1 ; -1 8 -1 ; -1 -1 -1];
+
+IconHP = imfilter(I, HP); 
+% Difumina y crea un borde negro alrededor de
+% la imagen ya que para pixeles fuera de la imagen utiliza negro.
+IconHP2 = imfilter(I, HP2);
+% Difumina más que el anterior y crea un borde mayor.
+IconHL = imfilter(I, HL);
+
+figure;
+subplot(1,3,1); imshow(IconHP); title('ones(5,5)/25');
+subplot(1,3,2); imshow(IconHP2); title('ones(9,9)/81'); 
+subplot(1,3,3); imshow(IconHL); title('[-1 -1 -1 ; -1 8 -1 ; -1 -1 -1]');
+
 %%
 % 6. Implemente un algoritmo que de forma automática segmente los objetos
 %    presentes en las imágenes A1, A2 y A3 facilitadas.
+A1 = imread('A1.JPG');
+A2 = imread('A2.jpg');
+A3 = imread('A3.jpg');
+umbralA1 = funcion_otsu(A1);
+umbralA2 = funcion_otsu(A2);
+umbralA3 = funcion_otsu(A3);
+
+MatumbralA1 = 255*graythresh(A1);
+MatumbralA2 = 255*graythresh(A2);
+MatumbralA3 = 255*graythresh(A3);
