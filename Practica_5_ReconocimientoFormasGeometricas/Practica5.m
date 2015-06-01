@@ -41,3 +41,76 @@ for i = 1:numeroDescriptores
 end
 
 
+%% VISUALIZACION
+
+figure;
+for i = 1:numeroDescriptores
+   subplot(2, ceil(numeroDescriptores/2), i);
+   plot(outputs, inputsNormalizados(i,:), '*');
+   
+end
+
+%% SELECCION
+
+separabilidad = [];
+for i = 1:numeroDescriptores
+    J = indiceJ(inputsNormalizados(i,:), outputs);
+    separabilidad = [separabilidad; J];
+end
+
+[nuevoOrden, indexs] = sort(separabilidad, 'descend');
+
+carPreSeleccionadas = 6;
+
+indexs = indexs(1:6);
+
+numeroCaracteristicasFinal = 3;
+combinaciones = combnk(indexs, numeroCaracteristicasFinal);
+
+[fil col] = size(combinaciones);
+
+separabilidadComb = zeros(fil, 1);
+for i = 1:fil 
+    subInputs = inputsNormalizados(combinaciones(i,:), :);
+    Jconjunta = indiceJ(subInputs, outputs);
+    separabilidadComb(i) = Jconjunta;
+end
+
+[sepMax, indexMax] = max(separabilidadComb);
+
+carateristicasSeleccionadas = combinaciones(indexMax, :); 
+
+%% SUGERENCIAS PARA PROYECTO
+% Paso1 
+% ObtenerDatosEntrenamiento
+% Array con medias y desviaciones (para normalizacines)
+
+% Paso2 
+% Clasificacion Inicial KNN_7Hu
+% con K = 1,3,5,10,15,20 con los 7 momentos de Hu
+% knn con euclidea y otro con mahalanois
+% Generar resultados para todas imagenes de test
+
+% Paso3
+% Analizar Resultados del paso2 para ver K mas adecuado y clases
+% conflictivas
+% 
+
+% Paso4
+% Seleccion descriptores para clases conflictivas
+% Calculando separabilidad (P5)
+% 
+
+% Paso5
+% Clasificador Final sobre Test
+% implementar clasificadores para clases conflictivas
+% Diferentes K en los nuevos clasificadores: 1, 3, 5.....
+
+% Paso6
+% Analizar resultados de P5 y elegir K final
+
+
+
+
+
+
