@@ -1,3 +1,7 @@
+clear; clc;
+path(path, genpath('./MaterialFacilitado/'));
+
+
 circ = 1;
 cuad = 2;
 trian = 3;
@@ -28,15 +32,18 @@ inputs = [inputs inputsTrian];
 outputs = [outputs repmat(trian, NTrian, 1)'];
 
 % Normalizacion
+mediaYstd = [];
 inputsNormalizados = [];
 for i = 1:numeroDescriptores
    descriptor = inputs(i,:);
    desviacion = std(descriptor);
    if (desviacion == 0)
        inputsNormalizados = [inputsNormalizados; descriptor];
+       mediaYstd = [mediaYstd; descriptor(1), desviacion];
    else
        media = mean(descriptor);
        inputsNormalizados = [inputsNormalizados; (descriptor-media)./desviacion];
+       mediaYstd = [mediaYstd; media, desviacion];
    end
 end
 
@@ -79,6 +86,37 @@ end
 [sepMax, indexMax] = max(separabilidadComb);
 
 carateristicasSeleccionadas = combinaciones(indexMax, :); 
+
+inputsDeTrabajo = inputsNormalizados(carateristicasSeleccionadas, :);
+
+%% TEST
+imgTest = imread('Test3.jpg');
+gthres = graythresh(imgTest);
+Ibin = imgTest < gthres;
+
+[vector, N] = genInputs(circB);
+[objs, N] = bwlabel(Ibin);
+vector = vector(carateristicasSeleccionadas,:);
+mediasYstdSeleccionadas = mediaYstd(carateristicasSeleccionadas,:);
+for i=1:N
+   funcion_visualiza(imgTest, objs == i, [255,0,0]);
+   class = knn(inputsDeTrabajo, outputs, (vector(:,i) - mediasYstdSeleccionadas(:,1)) ./ mediasYstdSeleccionadas(:,2) , 4);
+   classM = knnM(inputsDeTrabajo, outputs, (vector(:,i) - mediasYstdSeleccionadas(:,1)) ./ mediasYstdSeleccionadas(:,2) , 4);
+   if (classM == circ)
+       title('circulo');
+   elseif (classM == trian)
+       title('triangulo');
+   else
+       title('cuadrado');
+   end
+   
+   if(class ~= classM)
+       fprintf('fuck\n');
+   end
+   
+   waitforbuttonpress
+end
+
 
 %% SUGERENCIAS PARA PROYECTO
 % Paso1 

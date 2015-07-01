@@ -25,4 +25,3 @@ inputs = [compacticidad'; excentricidad'; BBox'; CHull'; NEuler'; momentosHu];
 
 
 end
-
