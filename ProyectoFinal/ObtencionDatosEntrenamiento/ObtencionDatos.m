@@ -17,7 +17,7 @@ for i=1:length(letras)
    img = rgb2gray(img);
    
    humbral = graythresh(img)*255;
-   Ib = img < humbral;
+   Ib = img <= humbral;
    [inputs_, N] = genInputs(Ib);
    
    outputs_ = repmat(i, N, 1)';
@@ -49,4 +49,6 @@ for i = 1:Ndescriptores
    end
    
 end
+
+save('DatosEntrenamiento', 'letras', 'descriptores', 'inputs', 'outputs', 'normInputs', 'media', 'desv');
 

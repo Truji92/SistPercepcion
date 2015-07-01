@@ -11,12 +11,24 @@ for i = 1:col
     dist(1,i) = distanciaE(inputs(:,i)', vector');
 end
 
-[newOrder, indexs] = sort(dist);
+[newOrder, indexs] = sort(dist, 'ascend');
 
-knearest = outputs(indexs(1:k));
+knearest = indexs(1:k);
 
-[salida veces] = mode(knearest);
-if veces == 1
-    salida = knearest(1);
+prob = tabulate(outputs(1, knearest));
+
+% 
+% vecinos = zeros(k);
+% for i = 1:k
+%     v = find(dist==min(dist));
+%     dist(v) = max(dist);
+%     vecinos(i) = v;
+% end
+% 
+% outs = outputs(1,vecinos(1:k));
+% prob = tabulate(outs);
+
+etiqueta =prob(find(prob(:,3)==max(prob(:,3))),1);
+salida = etiqueta(1);
 end
 

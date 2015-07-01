@@ -1,7 +1,7 @@
 path(path, './ImagenesTest');
 ext = '.tif';
 load('SalidasTeoricasImTests.mat');
-load('DatosEntrenamiento.mat');
+load('../ObtencionDatosEntrenamiento/DatosEntrenamiento.mat');
 
 %ConjuntoSalidasReales = [Salidas_Tests01; Salidas_Tests02; Salidas_Tests03; Salidas_Tests04; Salidas_Tests05; Salidas_Tests06; Salidas_Tests07; Salidas_Tests08; Salidas_Tests09; Salidas_Tests10];  
 
@@ -19,9 +19,12 @@ for i=1:1
     
     I = rgb2gray(imread(nombreImagen));
     
+    
+    I = I';
+    imshow(I);
     umbral = graythresh(I)*255;
     
-    Ib = I < umbral;
+    Ib = I <= umbral;
     
     todasLasInputs = genInputs(Ib);
     
@@ -31,7 +34,7 @@ for i=1:1
      todasLasInputs = todasLasInputs - medias;
      
      for descriptor=1:x
-         todasLasInputs(descriptor) = todasLasInputs(descriptor) ./ desv(descriptor);
+         todasLasInputs(descriptor, :) = todasLasInputs(descriptor, :) ./ desv(descriptor,1)
      end
      
     
