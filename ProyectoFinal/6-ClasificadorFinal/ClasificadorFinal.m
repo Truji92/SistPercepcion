@@ -1,0 +1,134 @@
+clc; clear;
+load('../3-Analisis Resultados/resultadosAnalisis.mat');
+load('../2-ClasificacionInicial/resultadosTest.mat');
+load('../1-ObtencionDatosEntrenamiento/DatosEntrenamiento.mat');
+load('../4-SeleccionCaracteristicas/CaracteristicasConflictos.mat');
+load('../5-AnalisisConflictos/AlgoritmosConflictos.mat');
+path(path, '../FuncionesAux');
+
+
+[fil casos] = size(TestInputs);
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+    
+
+    I = rgb2gray(imread('***'));
+    
+    
+    I = I';
+    
+    umbral = graythresh(I)*255;
+    
+    Ib = I <= umbral;
+    
+    todasLasInputs = genInputs(Ib);
+    
+    [x y z] = size(todasLasInputs);
+    medias = repmat(media, 1,y);
+    %NORMALIZAR LOS VALORES DE TEST
+     todasLasInputs = todasLasInputs - medias;
+     
+     for descriptor=1:x
+         todasLasInputs(descriptor, :) = todasLasInputs(descriptor, :) ./ desv(descriptor,1);
+     end
+
+
+%%[fil casos] = size(todasLasInputs);
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+resultado = zeros(1,casos);
+
+for i = 1:casos
+   
+    cuidadoConQ = 0;
+    hayConflicto = 0;
+    vector = TestInputs(:,i);
+    %%vector = todasLasInputs(:,i);
+    
+    if tipo == 0 %knn
+        resultado(i) = knn(normInputs(6:12, :), outputs, vector(6:12, :), k);
+    else %knnM
+        resultado(i) = knnM(normInputs(6:12, :), outputs, vector(6:12, :), k);
+    end
+        
+        
+      
+    if resultado(i) == find(letras == 'K')  % Q o K 
+       hayConflicto = 1;
+       fila = FilaAdecuada(find(FilaAdecuada(:,1) == resultado(i)),2);
+       
+    elseif ((resultado(i) == find(letras == 'H')) | (resultado(i) == find(letras == 'O')))
+        % O o H
+        hayConflicto = 1;
+        fila = FilaAdecuada(find(FilaAdecuada(:,1) == resultado(i)),2);
+    elseif resultado(i) == find(letras == 'F')
+        % Z o F
+        hayConflicto = 1;
+        fila = FilaAdecuada(find(FilaAdecuada(:,1) == resultado(i)),2);
+    elseif resultado(i) == find(letras == 'Q')
+        % Q o K o D
+        hayConflicto = 1;
+        fila = FilaAdecuada(find(FilaAdecuada(:,1) == resultado(i)),2);
+        cuidadoConQ = 1; %Q o D
+            
+    end
+    
+    
+    if hayConflicto == 1
+        descr = mejoresDescriptores(fila, :);
+        algoritmo = mejorAlgoritmo(fila,:);
+        columnas = find(ismember(outputs, conjuntosConflicto(fila,:)));
+
+
+        % eu 1; ma 2; knn 3; knnM 4
+        if mejorAlgoritmo(1) == 1
+            resultado(i) = ClasificadorMinEuclidea(normInputs(descr, columnas), outputs(columnas), vector(descr));
+        elseif mejorAlgoritmo(1) == 2
+            resultado(i) = ClasificadorMinMahala(normInputs(descr, columnas), outputs(columnas), vector(descr));
+        elseif mejorAlgoritmo(1) == 3
+            resultado(i) = knn(normInputs(descr, columnas), outputs(columnas), vector(descr), mejorAlgoritmo(2));
+        elseif mejorAlgoritmo(1) == 4
+            resultado(i) = knnM(normInputs(descr, columnas), outputs(columnas), vector(descr), mejorAlgortmo(2));
+        end
+        
+        if (cuidadoConQ == 1 & (resultado(i) == find(letras == 'Q') | resultado(i) == find(letras == 'D')))
+            % Q o D
+            fila = filaDQ;
+            descr = mejoresDescriptores(fila, :);
+            algoritmo = mejorAlgoritmo(fila,:);
+            columnas = find(ismember(outputs, conjuntosConflicto(fila,:)));
+
+
+            % eu 1; ma 2; knn 3; knnM 4
+            if mejorAlgoritmo(1) == 1
+                resultado(i) = ClasificadorMinEuclidea(normInputs(descr, columnas), outputs(columnas), vector(descr));
+            elseif mejorAlgoritmo(1) == 2
+                resultado(i) = ClasificadorMinMahala(normInputs(descr, columnas), outputs(columnas), vector(descr));
+            elseif mejorAlgoritmo(1) == 3
+                resultado(i) = knn(normInputs(descr, columnas), outputs(columnas), vector(descr), mejorAlgoritmo(2));
+            elseif mejorAlgoritmo(1) == 4
+                resultado(i) = knnM(normInputs(descr, columnas), outputs(columnas), vector(descr), mejorAlgortmo(2));
+            end
+        end
+    end
+    
+    
+end
+%letras(resultado)
+sum(resultado ~= ConjuntoSalidasReales)
+letras([ConjuntoSalidasReales;resultado])
+
+    
+
+
+
+
+
+
+

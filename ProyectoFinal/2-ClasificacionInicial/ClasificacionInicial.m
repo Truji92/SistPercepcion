@@ -1,14 +1,19 @@
+clc; clear;
 path(path, './ImagenesTest');
+path(path, '../FuncionesAux');
 ext = '.tif';
 load('SalidasTeoricasImTests.mat');
-load('../ObtencionDatosEntrenamiento/DatosEntrenamiento.mat');
+load('../1-ObtencionDatosEntrenamiento/DatosEntrenamiento.mat');
 
-%ConjuntoSalidasReales = [Salidas_Tests01; Salidas_Tests02; Salidas_Tests03; Salidas_Tests04; Salidas_Tests05; Salidas_Tests06; Salidas_Tests07; Salidas_Tests08; Salidas_Tests09; Salidas_Tests10];  
-
+ConjuntoSalidasReales = [Salidas_Tests01, Salidas_Tests02, Salidas_Tests03, Salidas_Tests04, Salidas_Tests05, Salidas_Tests06, Salidas_Tests07, Salidas_Tests08, Salidas_Tests09, Salidas_Tests10];  
+    
 numeroDeTests = 10;
 
-%for i =1:numeroDeTests
-for i=1:1 
+TestInputs = [];
+
+resultado = [];
+for i =1:numeroDeTests
+
     if (i < 10)
         nombreImagen = strcat('Test0', num2str(i), ext);
     else 
@@ -21,7 +26,7 @@ for i=1:1
     
     
     I = I';
-    imshow(I);
+    
     umbral = graythresh(I)*255;
     
     Ib = I <= umbral;
@@ -34,11 +39,13 @@ for i=1:1
      todasLasInputs = todasLasInputs - medias;
      
      for descriptor=1:x
-         todasLasInputs(descriptor, :) = todasLasInputs(descriptor, :) ./ desv(descriptor,1)
+         todasLasInputs(descriptor, :) = todasLasInputs(descriptor, :) ./ desv(descriptor,1);
      end
      
     
     %Solo se utilizan los hu
+    
+    TestInputs = [TestInputs, todasLasInputs];
 
     HuDeTests = todasLasInputs(6:end, :); %Seleccionamos los hu
     
@@ -49,18 +56,23 @@ for i=1:1
     
     resultknn = [];
     resultknnM = [];
-    for k=[1,3,5,10,15,20]
+    ks = [1,3,5,10,15,20];
+
+    for k = 1:length(ks)
         line = [];
         mline = [];
         for letra = 1:N
-            line = [line knn(InputSoloHu, outputs, HuDeTests(:, letra), k)];
-            mline = [mline knnM(InputSoloHu, outputs, HuDeTests(:, letra), k)];
+            line = [line knn(InputSoloHu, outputs, HuDeTests(:, letra), ks(k))];
+            mline = [mline knnM(InputSoloHu, outputs, HuDeTests(:, letra), ks(k))];
         end
         resultknn = [resultknn; line];
         resultknnM = [resultknnM; mline];
     end
     
+    resultadoaux = [resultknn; resultknnM];
+    resultado = [resultado, resultadoaux];
     
-    resultado = [Salidas_Tests01; resultknn; resultknnM]
     
 end
+
+    save('resultadosTest', 'resultado', 'ConjuntoSalidasReales', 'ks', 'letras', 'TestInputs');

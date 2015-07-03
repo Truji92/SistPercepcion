@@ -1,0 +1,28 @@
+clc; clear;
+load('../Analisis Resultados/resultadosAnalisis.mat');
+load('../ClasificacionInicial/resultadosTest.mat');
+load('../ObtencionDatosEntrenamiento/DatosEntrenamiento.mat');
+
+%% Definimos a mano los conjuntos que queremos analizar
+DQK = find(ismember(letras,'DQK'));
+OH = find(ismember(letras,'OH'));
+ZF =  find(ismember(letras,'ZF'));
+
+conjuntosConflicto = [DQK; OH, 0; ZF, 0];
+
+[ nConjuntos long] = size(conjuntosConflicto);
+
+mejoresDescriptores = zeros(nConjuntos, 3);
+for i = 1:nConjuntos
+    conjunto = conjuntosConflicto(i,find(conjuntosConflicto(i,:) ~= 0)); 
+    [descrip J] = mejores3(normInputs, outputs, conjuntosConflicto(i,:));
+    mejoresDescriptores(i, :) = descrip;
+    
+    letrasConflicto = letras(conjunto)
+    descriptoresElegidos = descriptores(mejoresDescriptores(i, :),:)
+    
+    fprintf('#####################################');
+end
+
+
+save('CaracteristicasConflictos', 'conjuntosConflicto', 'mejoresDescriptores');

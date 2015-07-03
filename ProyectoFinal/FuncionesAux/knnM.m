@@ -11,7 +11,7 @@ invCov = inv(covMatrix);
 
 dist = zeros(1,col);
 for i = 1:col
-    dist(1,i) = (vector - inputs(:,i))' * invCov * (vector - inputs(:,i));
+    dist(1,i) = sqrt((vector - inputs(:,i))' * invCov * (vector - inputs(:,i)));
 end
 
 [newOrder, indexs] = sort(dist);

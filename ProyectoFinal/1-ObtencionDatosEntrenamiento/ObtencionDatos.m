@@ -1,5 +1,6 @@
 clear; clc;
 path(path, './ImagenesEntrenamiento');
+path(path, '../FuncionesAux');
 
 letras = ['A' 'B' 'C' 'D' 'E' 'F' 'G' 'H' 'I' 'J' 'K' 'L' 'M' 'N' 'O' 'P' 'Q' 'R' 'S' 'T' 'U' 'V' 'W' 'X' 'Y' 'Z'];
 descriptores = ['Compact'; 'Excentr'; 'Sol(BB)'; 'Sol(CH)'; 'N_Euler'; 'M_Hu_01'; 'M_Hu_02'; 'M_Hu_03'; 'M_Hu_04'; 'M_Hu_05'; 'M_Hu_06'; 'M_Hu_07'];
